@@ -40,7 +40,7 @@ func TestHattaCallsNextHandlerIfMethodAllowed(t *testing.T) {
 		buf := tWriter{b: b}
 
 		m := Methods(v.m)
-		h := m.Else(err)
+		check := m.Else(err)
 
 		req := &http.Request{
 			Method: v.m,
@@ -49,7 +49,7 @@ func TestHattaCallsNextHandlerIfMethodAllowed(t *testing.T) {
 		hf := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			w.Write([]byte(v.b))
 		})
-		s := h(hf)
+		s := check(hf)
 		s.ServeHTTP(&buf, req)
 
 		assert.Equal(t, []byte(v.b), buf.b)
@@ -82,8 +82,8 @@ func TestWithAlice(t *testing.T) {
 	var b []byte
 	buf := tWriter{b: b}
 
-	m := Post()
-	h := m.Else(err)
+	post := Post()
+	postCheck := post.Else(err)
 	req := &http.Request{
 		Method: "POST",
 	}
@@ -91,7 +91,7 @@ func TestWithAlice(t *testing.T) {
 	hf := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("i got post"))
 	})
-	chain := alice.New(h).Then(hf)
+	chain := alice.New(postCheck).Then(hf)
 	chain.ServeHTTP(&buf, req)
 
 	assert.Equal(t, []byte("i got post"), buf.b)
