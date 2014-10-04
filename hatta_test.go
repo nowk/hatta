@@ -11,7 +11,7 @@ type tWriter struct {
 
 func (w *tWriter) Write(b []byte) (int, error) {
 	w.b = append(w.b, b...)
-	return len(w.b), nil
+	return len(b), nil
 }
 
 func (w *tWriter) Header() http.Header {
