@@ -90,7 +90,7 @@ func TestHattaBYOError(t *testing.T) {
 	assert.Equal(t, []byte("uh-oh"), buf.b)
 }
 
-func TestWithAlce(t *testing.T) {
+func TestWithAlice(t *testing.T) {
 	var b []byte
 	buf := tWriter{b: b}
 
