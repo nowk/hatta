@@ -9,13 +9,19 @@ Request method check middleware for [alice](https://github.com/justinas/alice)
 
 ## Examples
 
-    get := hatta.New("GET")
-    chain := alice.New(get, mwa, mwb, ...).Then(handler)
+    get := hatta.Methods("GET")
+    getCheck := get.Else(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+        http.Error(w, "not found", 404)
+    }))
 
-Or
+    chain := alice.New(getCheck, mwa, mwb, ...).Then(handler)
 
-    get := hatta.Get()
-    chain := alice.New(get, mwa, mwb, ...).Then(handler)
+Can handle multiple method checks
+
+    put := hatta.Methods("PUT", "PATCH")
+    putCheck := put.Else(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+        http.Error(w, "not found", 404)
+    }))
 
 ---
 
