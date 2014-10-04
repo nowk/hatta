@@ -36,3 +36,28 @@ type MethodError struct {
 func (m MethodError) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	http.Error(w, "not found", http.StatusNotFound)
 }
+
+// Get shortcut
+func Get(eh ...http.Handler) alice.Constructor {
+	return New("GET", eh...)
+}
+
+// Post shortcut
+func Post(eh ...http.Handler) alice.Constructor {
+	return New("POST", eh...)
+}
+
+// Put shortcut
+func Put(eh ...http.Handler) alice.Constructor {
+	return New("PUT", eh...)
+}
+
+// Patch shortcut
+func Patch(eh ...http.Handler) alice.Constructor {
+	return New("PATCH", eh...)
+}
+
+// Delete shortcut
+func Delete(eh ...http.Handler) alice.Constructor {
+	return New("DELETE", eh...)
+}
