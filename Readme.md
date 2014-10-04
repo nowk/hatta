@@ -17,6 +17,21 @@ Or
     get := hatta.Get()
     chain := alice.New(get, mwa, mwb, ...).Then(handler)
 
+---
+
+Doesn't directly require [alice](https://github.com/justinas/alice). Returns the `alice.Constructor` signature
+
+    func(http.Handler) http.Handler
+
+Has shortcuts for the basic `HTTP` methods.
+
+    Get()
+    Post()
+    Put()
+    Patch()
+    Delete()
+
+
 ## License
 
 MIT
