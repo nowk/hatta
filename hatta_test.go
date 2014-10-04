@@ -22,6 +22,10 @@ func (w *tWriter) WriteHeader(n int) {
 	//\
 }
 
+var err = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	http.Error(w, "you got error", 400)
+})
+
 func TestHattaCallsNextHandlerIfMethodAllowed(t *testing.T) {
 	for _, v := range []struct {
 		m, b string
@@ -35,7 +39,9 @@ func TestHattaCallsNextHandlerIfMethodAllowed(t *testing.T) {
 		var b []byte
 		buf := tWriter{b: b}
 
-		h := New(v.m)
+		m := Methods(v.m)
+		h := m.Else(err)
+
 		req := &http.Request{
 			Method: v.m,
 		}
@@ -50,11 +56,15 @@ func TestHattaCallsNextHandlerIfMethodAllowed(t *testing.T) {
 	}
 }
 
-func TestHattaDefaultError(t *testing.T) {
+func TestHattaHandleError(t *testing.T) {
 	var b []byte
 	buf := tWriter{b: b}
 
-	h := New("GET")
+	get := Get()
+	getCheck := get.Else(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		http.Error(w, "not found", 404)
+	}))
+
 	req := &http.Request{
 		Method: "PUT",
 	}
@@ -62,39 +72,18 @@ func TestHattaDefaultError(t *testing.T) {
 	hf := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("i got put"))
 	})
-	s := h(hf)
+	s := getCheck(hf)
 	s.ServeHTTP(&buf, req)
 
 	assert.Equal(t, []byte("not found\n"), buf.b)
-}
-
-func TestHattaBYOError(t *testing.T) {
-	var b []byte
-	buf := tWriter{b: b}
-
-	ef := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		w.Write([]byte("uh-oh"))
-	})
-
-	h := New("GET", ef)
-	req := &http.Request{
-		Method: "PUT",
-	}
-
-	hf := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		w.Write([]byte("i got put"))
-	})
-	s := h(hf)
-	s.ServeHTTP(&buf, req)
-
-	assert.Equal(t, []byte("uh-oh"), buf.b)
 }
 
 func TestWithAlice(t *testing.T) {
 	var b []byte
 	buf := tWriter{b: b}
 
-	h := New("POST")
+	m := Post()
+	h := m.Else(err)
 	req := &http.Request{
 		Method: "POST",
 	}
