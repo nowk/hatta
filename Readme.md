@@ -7,8 +7,13 @@ Hatta - Request method check middleware for [alice](https://github.com/justinas/
 
 ## Examples
 
-    h := hatta.New("GET")
-    chain := alice.New(h, mwa, mwb, ...).Then(handler)
+    get := hatta.New("GET")
+    chain := alice.New(get, mwa, mwb, ...).Then(handler)
+
+Or
+
+    get := hatta.Get()
+    chain := alice.New(get, mwa, mwb, ...).Then(handler)
 
 ## License
 
