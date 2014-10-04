@@ -4,7 +4,9 @@ import "net/http"
 import "github.com/justinas/alice"
 import "github.com/nowk/go-methods"
 
-// New returns a alice.Constructor
+// New returns an alice.Constructor middleware bound to a given HTTP method. If
+// a custom error handler is not provided, the default handler will be used and
+// return a 404 "not found" response when an unallowed method is met.
 func New(mstr string, eh ...http.Handler) alice.Constructor {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
