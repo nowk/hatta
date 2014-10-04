@@ -1,13 +1,13 @@
 package hatta
 
 import "net/http"
-import "github.com/justinas/alice"
 import "github.com/nowk/go-methods"
 
-// New returns an alice.Constructor middleware bound to a given HTTP method. If
-// a custom error handler is not provided, the default handler will be used and
-// return a 404 "not found" response when an unallowed method is met.
-func New(mstr string, eh ...http.Handler) alice.Constructor {
+// New returns an alice.Constructor singature middleware bound to a given HTTP
+// method. If a custom error handler is not provided, the default handler will
+// be used and return a 404 "not found" response when an unallowed method is
+// met.
+func New(mstr string, eh ...http.Handler) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			m := methods.Allow(mstr)
@@ -40,26 +40,26 @@ func (m MethodError) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 // Get shortcut
-func Get(eh ...http.Handler) alice.Constructor {
+func Get(eh ...http.Handler) func(http.Handler) http.Handler {
 	return New("GET", eh...)
 }
 
 // Post shortcut
-func Post(eh ...http.Handler) alice.Constructor {
+func Post(eh ...http.Handler) func(http.Handler) http.Handler {
 	return New("POST", eh...)
 }
 
 // Put shortcut
-func Put(eh ...http.Handler) alice.Constructor {
+func Put(eh ...http.Handler) func(http.Handler) http.Handler {
 	return New("PUT", eh...)
 }
 
 // Patch shortcut
-func Patch(eh ...http.Handler) alice.Constructor {
+func Patch(eh ...http.Handler) func(http.Handler) http.Handler {
 	return New("PATCH", eh...)
 }
 
 // Delete shortcut
-func Delete(eh ...http.Handler) alice.Constructor {
+func Delete(eh ...http.Handler) func(http.Handler) http.Handler {
 	return New("DELETE", eh...)
 }
