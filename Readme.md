@@ -5,6 +5,8 @@
 
 Hatta - Request method check middleware for [alice](https://github.com/justinas/alice)
 
+![The Mad Hatter](https://raw.githubusercontent.com/nowk/hatta/master/MadlHatterByTenniel.jpg)
+
 ## Examples
 
     get := hatta.New("GET")
