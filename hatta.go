@@ -1,7 +1,7 @@
 package hatta
 
 import "net/http"
-import "github.com/nowk/go-methods"
+import "github.com/nowk/methods"
 
 type MethodCheck struct {
 	check *methods.Bouncer
