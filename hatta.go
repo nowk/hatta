@@ -36,27 +36,22 @@ func (m MethodCheck) Else(er http.Handler) func(http.Handler) http.Handler {
 	}
 }
 
-// Get shortcut
 func Get() *MethodCheck {
 	return Methods("GET")
 }
 
-// Post shortcut
 func Post() *MethodCheck {
 	return Methods("POST")
 }
 
-// Put shortcut
 func Put() *MethodCheck {
 	return Methods("PUT")
 }
 
-// Patch shortcut
 func Patch() *MethodCheck {
 	return Methods("PATCH")
 }
 
-// Delete shortcut
 func Delete() *MethodCheck {
 	return Methods("DELETE")
 }
