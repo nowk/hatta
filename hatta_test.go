@@ -4,23 +4,7 @@ import "net/http"
 import "testing"
 import "github.com/justinas/alice"
 import "github.com/nowk/assert"
-
-type tWriter struct {
-	b []byte
-}
-
-func (w *tWriter) Write(b []byte) (int, error) {
-	w.b = append(w.b, b...)
-	return len(b), nil
-}
-
-func (w *tWriter) Header() http.Header {
-	return http.Header{}
-}
-
-func (w *tWriter) WriteHeader(n int) {
-	//\
-}
+import "net/http/httptest"
 
 var err = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 	http.Error(w, "you got error", 400)
@@ -36,8 +20,7 @@ func TestHattaCallsNextHandlerIfMethodAllowed(t *testing.T) {
 		{"PATCH", "i got patch"},
 		{"DELETE", "i got delete"},
 	} {
-		var b []byte
-		buf := tWriter{b: b}
+		w := httptest.NewRecorder()
 
 		m := Methods(v.m)
 		check := m.Else(err)
@@ -50,15 +33,14 @@ func TestHattaCallsNextHandlerIfMethodAllowed(t *testing.T) {
 			w.Write([]byte(v.b))
 		})
 		s := check(hf)
-		s.ServeHTTP(&buf, req)
+		s.ServeHTTP(w, req)
 
-		assert.Equal(t, []byte(v.b), buf.b)
+		assert.Equal(t, v.b, w.Body.String())
 	}
 }
 
 func TestHattaHandleError(t *testing.T) {
-	var b []byte
-	buf := tWriter{b: b}
+	w := httptest.NewRecorder()
 
 	get := Get()
 	getCheck := get.Else(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -73,14 +55,13 @@ func TestHattaHandleError(t *testing.T) {
 		w.Write([]byte("i got put"))
 	})
 	s := getCheck(hf)
-	s.ServeHTTP(&buf, req)
+	s.ServeHTTP(w, req)
 
-	assert.Equal(t, []byte("not found\n"), buf.b)
+	assert.Equal(t, "not found\n", w.Body.String())
 }
 
 func TestWithAlice(t *testing.T) {
-	var b []byte
-	buf := tWriter{b: b}
+	w := httptest.NewRecorder()
 
 	post := Post()
 	postCheck := post.Else(err)
@@ -92,7 +73,7 @@ func TestWithAlice(t *testing.T) {
 		w.Write([]byte("i got post"))
 	})
 	chain := alice.New(postCheck).Then(hf)
-	chain.ServeHTTP(&buf, req)
+	chain.ServeHTTP(w, req)
 
-	assert.Equal(t, []byte("i got post"), buf.b)
+	assert.Equal(t, "i got post", w.Body.String())
 }
