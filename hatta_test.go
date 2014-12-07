@@ -24,17 +24,15 @@ func TestHattaCallsNextHandlerIfMethodAllowed(t *testing.T) {
 
 		m := Methods(v.m)
 		check := m.Else(err)
-
 		req := &http.Request{
 			Method: v.m,
 		}
 
-		hf := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		h := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			w.Write([]byte(v.b))
 		})
-		s := check(hf)
+		s := check(h)
 		s.ServeHTTP(w, req)
-
 		assert.Equal(t, v.b, w.Body.String())
 	}
 }
@@ -46,17 +44,15 @@ func TestHattaHandleError(t *testing.T) {
 	getCheck := get.Else(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "not found", 404)
 	}))
-
 	req := &http.Request{
 		Method: "PUT",
 	}
 
-	hf := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	h := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("i got put"))
 	})
-	s := getCheck(hf)
+	s := getCheck(h)
 	s.ServeHTTP(w, req)
-
 	assert.Equal(t, "not found\n", w.Body.String())
 }
 
@@ -69,11 +65,10 @@ func TestWithAlice(t *testing.T) {
 		Method: "POST",
 	}
 
-	hf := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	h := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("i got post"))
 	})
-	chain := alice.New(postCheck).Then(hf)
+	chain := alice.New(postCheck).Then(h)
 	chain.ServeHTTP(w, req)
-
 	assert.Equal(t, "i got post", w.Body.String())
 }
